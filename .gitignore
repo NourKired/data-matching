@@ -1,0 +1,7 @@
+.vscode/
+.idea/
+
+dist/
+*.pyc
+
+coverage.xml

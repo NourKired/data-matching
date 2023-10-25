@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "data-matching"
+version = "0.1.0"
+description = "data alignement for my thesis - experiments"
+authors = ["nkired <nada.kired@gmail.com>"]
+license = "BSD 3-Clause License"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.1.7"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^6.1.0"
+flake8-bugbear = "^23.9.16"
+mypy = "^1.5"
+pytest = "^7.4.2"
+pytest-cov = "^4.1.0"
+
+[tool.semantic_release]
+version_variable = [
+    "src/data_matching/__init__.py:__version__",
+    "pyproject.toml:version"
+]
+branch = "main"
+upload_to_pypi = false
+upload_to_release = true
+build_command = "pip install poetry && poetry build"
+
+[tool.poetry.scripts]
+data-matching = "data_matching.main:cli"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
