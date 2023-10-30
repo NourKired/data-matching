@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.decomposition import PCA
 
 
-from EmbDI.logger import *
+from src.data_matching.EmbDI.logger import *
 
 
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'

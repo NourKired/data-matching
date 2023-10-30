@@ -3,8 +3,8 @@ import random
 
 from tqdm import tqdm
 
-from EmbDI.graph import Node
-from EmbDI.utils import *
+from src.data_matching.EmbDI.graph import Node
+from src.data_matching.EmbDI.utils import *
 
 
 class RandomWalk:
@@ -133,8 +133,7 @@ def generate_walks(parameters, graph, intersection=None):
 
     # ########### Random walks ############
     # print('Generating random walks.')
-
-    walks_file = "pipeline/walks/" + parameters["output_file"] + ".walks"
+    walks_file = parameters["output_file"] + ".walks"
 
     if parameters["write_walks"]:
         fp_walks = open(walks_file, "w")
