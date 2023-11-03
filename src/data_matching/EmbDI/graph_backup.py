@@ -6,13 +6,15 @@ import numpy as np
 
 from tqdm import tqdm
 
+
 class Node:
     """
-        Cell class used to describe the nodes that build the graph.
+    Cell class used to describe the nodes that build the graph.
     """
+
     def __init__(self, name, type, frequency, p_stay=0.5):
-        if type not in ['cell', 'rid', 'attr']:
-            raise ValueError('Type unrecognized.')
+        if type not in ["cell", "rid", "attr"]:
+            raise ValueError("Type unrecognized.")
         self.random_neigh = None
         self.right = set([])
         self.left = set([])
@@ -28,14 +30,16 @@ class Node:
         self.similar_distance = [1.0]
 
     def _prepare_aliased_randomizer(self, weights):
-        '''Implemented according to the alias method.
+        """Implemented according to the alias method.
 
         :param weights:
         :return: Aliased randomizer
-        '''
+        """
         node_number = len(weights)
         if node_number == 0:
-            raise ValueError('Node {} has no neighbors. Check the input dataset. '.format(self.name))
+            raise ValueError(
+                "Node {} has no neighbors. Check the input dataset. ".format(self.name)
+            )
         avg_weight = sum(weights) / node_number
         alias_vector = [(1, None)] * node_number
         smalls = ((i, w / avg_weight) for i, w in enumerate(weights) if w < avg_weight)
@@ -102,26 +106,32 @@ class Node:
     def rebuild(self):
         if np.nan in self.left:
             self.left.remove(np.nan)
-        if '' in self.left:
-            self.left.remove('')
+        if "" in self.left:
+            self.left.remove("")
         self.left = list(self.left)
 
         if np.nan in self.right:
             self.right.remove(np.nan)
-        if '' in self.right:
-            self.right.remove('')
+        if "" in self.right:
+            self.right.remove("")
         self.right = list(self.right)
 
         if len(self.similar_distance) > 1:
             candidates_replacement = self.similar_distance[1:]
             sum_cand = sum(candidates_replacement)
             if sum_cand >= 1:
-                candidates_replacement = np.array(candidates_replacement) / sum_cand * (1-self.p_stay)
+                candidates_replacement = (
+                    np.array(candidates_replacement) / sum_cand * (1 - self.p_stay)
+                )
             else:
-                candidates_replacement = np.array(candidates_replacement) * sum_cand * (1-self.p_stay)
+                candidates_replacement = (
+                    np.array(candidates_replacement) * sum_cand * (1 - self.p_stay)
+                )
         else:
             candidates_replacement = []
-        self.similar_distance = [1-sum(candidates_replacement)] + list(candidates_replacement)
+        self.similar_distance = [1 - sum(candidates_replacement)] + list(
+            candidates_replacement
+        )
         self.n_similar = len(self.similar_tokens)
 
     def add_similar(self, other, distance):
@@ -129,26 +139,26 @@ class Node:
         self.similar_distance.append(distance)
 
     def get_next(self, direction):
-        if self.type == 'rid':
-            if direction == 'left':
-                raise ValueError('Error: in rid token, cannot go left.')
-        if self.type == 'attr':
-            if direction == 'right':
-                raise ValueError('Error: in attr token, cannot go right.')
-        if direction == 'left':
+        if self.type == "rid":
+            if direction == "left":
+                raise ValueError("Error: in rid token, cannot go left.")
+        if self.type == "attr":
+            if direction == "right":
+                raise ValueError("Error: in attr token, cannot go right.")
+        if direction == "left":
             return random.choice(self.left)
-        if direction == 'right':
+        if direction == "right":
             return random.choice(self.right)
 
     def get_random_rid(self):
-        if self.type != 'cell':
-            raise ValueError('Error: in rid token, cannot go left.')
+        if self.type != "cell":
+            raise ValueError("Error: in rid token, cannot go left.")
         else:
             return random.choice(self.left)
 
     def get_random_cid(self):
-        if self.type != 'cell':
-            raise ValueError('Error: in rid token, cannot go left.')
+        if self.type != "cell":
+            raise ValueError("Error: in rid token, cannot go left.")
         else:
             return random.choice(list(self.right))
 
@@ -161,7 +171,6 @@ class Edge:
 
 
 class Graph:
-
     @staticmethod
     def f_no_smoothing():
         return 1.0
@@ -174,27 +183,27 @@ class Graph:
 
     @staticmethod
     def inverse_smooth(x, s):
-        y = 1 / 2 * (-(1 + s) ** (1 - x) + 2)
+        y = 1 / 2 * (-((1 + s) ** (1 - x)) + 2)
         return y
 
     @staticmethod
     def inverse_freq(freq):
-        return 1/freq
+        return 1 / freq
 
     @staticmethod
     def log_freq(freq, base=10):
         return 1 / (math.log(freq, base) + 1)
 
     def smooth_freq(self, freq, eps=0.01):
-        if self.smoothing_method == 'smooth':
+        if self.smoothing_method == "smooth":
             return self.smooth_exp(freq, eps, self.smoothing_target)
-        if self.smoothing_method == 'inverse_smooth':
+        if self.smoothing_method == "inverse_smooth":
             return self.inverse_smooth(freq, self.smoothing_k)
-        elif self.smoothing_method == 'log':
+        elif self.smoothing_method == "log":
             return self.log_freq(freq, self.smoothing_target)
-        elif self.smoothing_method == 'inverse':
+        elif self.smoothing_method == "inverse":
             return self.inverse_freq(freq)
-        elif self.smoothing_method == 'no':
+        elif self.smoothing_method == "no":
             return self.f_no_smoothing()
 
     def compute_n_sentences(self, sentence_length, factor=1000):
@@ -205,8 +214,12 @@ class Graph:
         :param factor: "desired" number of occurrences of each node
         :return: n_sentences
         """
-        n = len(self.nodes)*factor//sentence_length
-        print('# Computing default number of sentences.\n{} sentences will be generated.'.format(n))
+        n = len(self.nodes) * factor // sentence_length
+        print(
+            "# Computing default number of sentences.\n{} sentences will be generated.".format(
+                n
+            )
+        )
         return n
 
     def add_edge(self, node_from, node_to):
@@ -229,11 +242,11 @@ class Graph:
                 cell_value = str(node)
             except OverflowError:
                 cell_value = str(node)
-            if cell_value.startswith('idx_'):
-                cell_value = 'dfc_' + cell_value
+            if cell_value.startswith("idx_"):
+                cell_value = "dfc_" + cell_value
 
             smoothed_f = self.smooth_freq(frequencies[node])
-            self.nodes[cell_value] = Node(cell_value, 'cell', frequency=smoothed_f)
+            self.nodes[cell_value] = Node(cell_value, "cell", frequency=smoothed_f)
 
     def init_nodes_flatten(self, frequencies, flatten):
         for node in frequencies:
@@ -247,22 +260,22 @@ class Graph:
             except OverflowError:
                 cell_value = str(node)
             # smoothed_f = self.smooth_freq(frequencies[node])
-            if cell_value.startswith('idx_'):
-                cell_value = 'dfc_' + cell_value
+            if cell_value.startswith("idx_"):
+                cell_value = "dfc_" + cell_value
 
             smoothed_f = self.smooth_freq(frequencies[node])
 
             if flatten:
-                for split in cell_value.split('_'):
-                    self.nodes[split] = Node(split, 'cell', frequency=1)
+                for split in cell_value.split("_"):
+                    self.nodes[split] = Node(split, "cell", frequency=1)
             else:
-                self.nodes[cell_value] = Node(cell_value, 'cell', frequency=smoothed_f)
+                self.nodes[cell_value] = Node(cell_value, "cell", frequency=smoothed_f)
 
     def init_rids(self, df):
         n_rows = len(df)
         for idx in range(n_rows):
-            s_idx = 'idx_{}'.format(idx)
-            self.nodes[s_idx] = Node(s_idx, 'rid', frequency=1)
+            s_idx = "idx_{}".format(idx)
+            self.nodes[s_idx] = Node(s_idx, "rid", frequency=1)
             self.rid_list.append(s_idx)
 
     def init_cids(self, df):
@@ -270,11 +283,11 @@ class Graph:
             col = df.columns[c]
             if col not in self.cid_list:
                 if col in self.nodes:
-                    col = 'dfcol_' + col
+                    col = "dfcol_" + col
                     columns = list(df.columns)
                     columns[c] = col
                     df.columns = columns
-                self.nodes[col] = Node(col, 'attr', frequency=1)
+                self.nodes[col] = Node(col, "attr", frequency=1)
             self.cid_list.append(col)
 
     def add_similarities(self, sim_list):
@@ -302,52 +315,72 @@ class Graph:
         return self.nodes[node].neighbor_names, self.nodes[node].neighbor_frequencies
 
     def _parse_smoothing_method(self, smoothing_method):
-        if smoothing_method.startswith('smooth'):
-            smooth_split = smoothing_method.split(',')
+        if smoothing_method.startswith("smooth"):
+            smooth_split = smoothing_method.split(",")
             if len(smooth_split) == 3:
-                self.smoothing_method, self.smoothing_k, self.smoothing_target = smooth_split
+                (
+                    self.smoothing_method,
+                    self.smoothing_k,
+                    self.smoothing_target,
+                ) = smooth_split
                 self.smoothing_k = float(self.smoothing_k)
                 self.smoothing_target = float(self.smoothing_target)
                 if not 0 <= self.smoothing_k <= 1:
-                    raise ValueError('Smoothing k must be in range [0,1], current k = {}'.format(self.smoothing_k))
+                    raise ValueError(
+                        "Smoothing k must be in range [0,1], current k = {}".format(
+                            self.smoothing_k
+                        )
+                    )
                 if self.smoothing_target < 1:
-                    raise ValueError('Smoothing target must be > 1, current target = {}'.format(self.smoothing_target))
+                    raise ValueError(
+                        "Smoothing target must be > 1, current target = {}".format(
+                            self.smoothing_target
+                        )
+                    )
             elif len(smooth_split) == 1:
-                self.smoothing_method = 'smooth'
+                self.smoothing_method = "smooth"
                 self.smoothing_k = 0.2
                 self.smoothing_target = 200
             else:
-                raise ValueError('Unknown smoothing parameters.')
-        if smoothing_method.startswith('inverse_smooth'):
-            smooth_split = smoothing_method.split(',')
+                raise ValueError("Unknown smoothing parameters.")
+        if smoothing_method.startswith("inverse_smooth"):
+            smooth_split = smoothing_method.split(",")
             if len(smooth_split) == 2:
                 self.smoothing_method, self.smoothing_k = smooth_split
                 self.smoothing_k = float(self.smoothing_k)
             elif len(smooth_split) == 1:
-                self.smoothing_method = 'inverse_smooth'
+                self.smoothing_method = "inverse_smooth"
                 self.smoothing_k = 0.1
             else:
-                raise ValueError('Unknown smoothing parameters.')
-        elif smoothing_method.startswith('log'):
-            log_split = smoothing_method.split(',')
+                raise ValueError("Unknown smoothing parameters.")
+        elif smoothing_method.startswith("log"):
+            log_split = smoothing_method.split(",")
             if len(log_split) == 2:
                 self.smoothing_method, self.smoothing_target = log_split
                 self.smoothing_target = float(self.smoothing_target)
                 if self.smoothing_target <= 1:
-                    raise ValueError('Log base must be > 1, current base = {}'.format(self.smoothing_target))
+                    raise ValueError(
+                        "Log base must be > 1, current base = {}".format(
+                            self.smoothing_target
+                        )
+                    )
             elif len(log_split) == 1:
-                self.smoothing_method = 'log'
+                self.smoothing_method = "log"
                 self.smoothing_target = 10
             else:
-                raise ValueError('Unknown smoothing parameters.')
-        elif smoothing_method.startswith('piecewise'):
-            piecewise_split = smoothing_method.split(',')
+                raise ValueError("Unknown smoothing parameters.")
+        elif smoothing_method.startswith("piecewise"):
+            piecewise_split = smoothing_method.split(",")
             if len(piecewise_split) == 2:
                 self.smoothing_method, self.smoothing_target = piecewise_split
                 self.smoothing_target = float(self.smoothing_target)
                 self.smoothing_k = 10
             elif len(piecewise_split) == 3:
-                self.smoothing_method, self.smoothing_target, self.smoothing_k = piecewise_split
+                (
+                    self.smoothing_method,
+                    self.smoothing_target,
+                    self.smoothing_k,
+                ) = piecewise_split
                 self.smoothing_target = float(self.smoothing_target)
                 self.smoothing_k = float(self.smoothing_k)
             elif len(piecewise_split) == 1:
@@ -355,11 +388,11 @@ class Graph:
                 self.smoothing_target = 20
                 self.smoothing_k = 10
             else:
-                raise ValueError('Unknown smoothing parameters. ')
+                raise ValueError("Unknown smoothing parameters. ")
         else:
             self.smoothing_method = smoothing_method
 
-    def __init__(self, df, sim_list=None, smoothing_method='smooth', flatten=True):
+    def __init__(self, df, sim_list=None, smoothing_method="smooth", flatten=True):
         """Data structure used to represent dataframe df as a graph. The data structure contains a list of all nodes
         in the graph, built according to the parameters passed to the function.
 
@@ -375,19 +408,21 @@ class Graph:
         self.nodes = {}
         self.edges = set()
         self._parse_smoothing_method(smoothing_method)
-        df = df.fillna('')
+        df = df.fillna("")
 
-        values, counts = np.unique(df.values.ravel(), return_counts=True)  # Count unique values to find word frequency.
+        values, counts = np.unique(
+            df.values.ravel(), return_counts=True
+        )  # Count unique values to find word frequency.
 
         frequencies = dict(zip(values, counts))
 
-        frequencies.pop('', None)
+        frequencies.pop("", None)
         frequencies.pop(np.nan, None)
 
         if flatten:
-            print('# Flatten = True, expanding strings.')
+            print("# Flatten = True, expanding strings.")
         else:
-            print('# Flatten = False, all strings will be tokenized.')
+            print("# Flatten = False, all strings will be tokenized.")
         self.init_nodes_flatten(frequencies, flatten)
         self.init_rids(df)
         self.init_cids(df)
@@ -395,11 +430,11 @@ class Graph:
         # for row in df.itertuples(index=True):
         for idx, r in tqdm(df.iterrows()):
             # Create a node for the current row id.
-            rid = 'idx_' + str(idx)
+            rid = "idx_" + str(idx)
             row = r.dropna()
             for col in df.columns:
                 cell_value = row[col]
-                if cell_value == '':
+                if cell_value == "":
                     continue
                 try:
                     float_c = float(cell_value)
@@ -413,12 +448,12 @@ class Graph:
 
                 c = col
                 if flatten:
-                    valsplit = cell_value.split('_')
+                    valsplit = cell_value.split("_")
                 else:
                     valsplit = [cell_value]
                 for split in valsplit:
                     if split not in self.nodes:
-                        raise KeyError('{} not found in self.nodes'.format(split))
+                        raise KeyError("{} not found in self.nodes".format(split))
                     self.add_edge(self.nodes[rid], self.nodes[split])
                     self.add_edge(self.nodes[split], self.nodes[rid])
                     self.add_edge(self.nodes[c], self.nodes[split])
@@ -434,12 +469,12 @@ class Graph:
             #       count_rows/len(df) * 100, count_rows, len(df)), end='')
             count_rows += 1
 
-        print('')
+        print("")
         count_nodes = 1
         to_delete = []
         for node in tqdm(self.nodes):
             if len(self.nodes[node].neighbors) == 0:
-                warnings.warn('Node {} has no neighbors'.format(node))
+                warnings.warn("Node {} has no neighbors".format(node))
                 to_delete.append(node)
             else:
                 self.nodes[node].normalize_neighbors()
@@ -447,7 +482,7 @@ class Graph:
                 #                                                    count_nodes / len(self.nodes) * 100,
                 #                                                    count_nodes, len(self.nodes)), end='')
             count_nodes += 1
-        print('')
+        print("")
         for node in to_delete:
             self.nodes.pop(node)
         # self.edges = None  # remove the edges list since to save memory

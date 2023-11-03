@@ -24,16 +24,35 @@ def parse_args():
         argparse.ArgumentParser: Parser.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input_file", required=True, type=str, help="Path to input csv file to translate.")
-    parser.add_argument("-o", "--output_file", required=True, type=str, help="Path to output edgelist_file.")
+    parser.add_argument(
+        "-i",
+        "--input_file",
+        required=True,
+        type=str,
+        help="Path to input csv file to translate.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output_file",
+        required=True,
+        type=str,
+        help="Path to output edgelist_file.",
+    )
     # parser.add_argument('--tokenization', required=True, type=str, choices=['token', 'flatten', 'all'],
     #                     help='Tokenization strategy to use.')
     parser.add_argument(
-        "--info_file", required=False, type=str, default=None, help="Path to info file with df boundaries."
+        "--info_file",
+        required=False,
+        type=str,
+        default=None,
+        help="Path to info file with df boundaries.",
     )
 
     parser.add_argument(
-        "--export", required=False, action="store_true", help="Flag for exporting the edgelist in networkx format."
+        "--export",
+        required=False,
+        action="store_true",
+        help="Flag for exporting the edgelist in networkx format.",
     )
 
     return parser.parse_args()
@@ -139,13 +158,25 @@ class EdgeList:
         if smoothing_method.startswith("smooth"):
             smooth_split = smoothing_method.split(",")
             if len(smooth_split) == 3:
-                self.smoothing_method, self.smoothing_k, self.smoothing_target = smooth_split
+                (
+                    self.smoothing_method,
+                    self.smoothing_k,
+                    self.smoothing_target,
+                ) = smooth_split
                 self.smoothing_k = float(self.smoothing_k)
                 self.smoothing_target = float(self.smoothing_target)
                 if not 0 <= self.smoothing_k <= 1:
-                    raise ValueError("Smoothing k must be in range [0,1], current k = {}".format(self.smoothing_k))
+                    raise ValueError(
+                        "Smoothing k must be in range [0,1], current k = {}".format(
+                            self.smoothing_k
+                        )
+                    )
                 if self.smoothing_target < 1:
-                    raise ValueError("Smoothing target must be > 1, current target = {}".format(self.smoothing_target))
+                    raise ValueError(
+                        "Smoothing target must be > 1, current target = {}".format(
+                            self.smoothing_target
+                        )
+                    )
             elif len(smooth_split) == 1:
                 self.smoothing_method = "smooth"
                 self.smoothing_k = 0.2
@@ -168,7 +199,11 @@ class EdgeList:
                 self.smoothing_method, self.smoothing_target = log_split
                 self.smoothing_target = float(self.smoothing_target)
                 if self.smoothing_target <= 1:
-                    raise ValueError("Log base must be > 1, current base = {}".format(self.smoothing_target))
+                    raise ValueError(
+                        "Log base must be > 1, current base = {}".format(
+                            self.smoothing_target
+                        )
+                    )
             elif len(log_split) == 1:
                 self.smoothing_method = "log"
                 self.smoothing_target = 10
@@ -181,7 +216,11 @@ class EdgeList:
                 self.smoothing_target = float(self.smoothing_target)
                 self.smoothing_k = 10
             elif len(piecewise_split) == 3:
-                self.smoothing_method, self.smoothing_target, self.smoothing_k = piecewise_split
+                (
+                    self.smoothing_method,
+                    self.smoothing_target,
+                    self.smoothing_k,
+                ) = piecewise_split
                 self.smoothing_target = float(self.smoothing_target)
                 self.smoothing_k = float(self.smoothing_k)
             elif len(piecewise_split) == 1:
@@ -237,7 +276,9 @@ class EdgeList:
                 split_values += split
             frequencies = dict(Counter(split_values))
         else:
-            frequencies = dict(Counter([str(_) for _ in df.values.ravel().tolist() if _ == _]))
+            frequencies = dict(
+                Counter([str(_) for _ in df.values.ravel().tolist() if _ == _])
+            )
         # Remove null values if they somehow slipped in.
         frequencies.pop("", None)
         frequencies.pop(np.nan, None)
@@ -334,7 +375,14 @@ class EdgeList:
 
                         weight_rid_to_cell = 1
                         weight_cell_to_rid = smoothed_f
-                        self.edgelist.append((rid_node, cell_node, weight_rid_to_cell, weight_cell_to_rid))
+                        self.edgelist.append(
+                            (
+                                rid_node,
+                                cell_node,
+                                weight_rid_to_cell,
+                                weight_cell_to_rid,
+                            )
+                        )
 
                         if col in numeric_columns:
                             cell_node = "tn__" + split
@@ -344,15 +392,28 @@ class EdgeList:
                         cid_node = "cid__" + col
                         weight_cell_to_cid = smoothed_f
                         weight_cid_to_cell = 1
-                        self.edgelist.append((cell_node, cid_node, weight_cell_to_cid, weight_cid_to_cell))
+                        self.edgelist.append(
+                            (
+                                cell_node,
+                                cid_node,
+                                weight_cell_to_cid,
+                                weight_cid_to_cell,
+                            )
+                        )
 
                         if fp is not None:
                             edgerow_rid_cell = "{},{},{},{}\n".format(
-                                rid_node, cell_node, weight_rid_to_cell, weight_cell_to_rid
+                                rid_node,
+                                cell_node,
+                                weight_rid_to_cell,
+                                weight_cell_to_rid,
                             )
                             fp.write(edgerow_rid_cell)
                             edgerow_cid_cell = "{},{},{},{}\n".format(
-                                cell_node, cid_node, weight_cell_to_cid, weight_cid_to_cell
+                                cell_node,
+                                cid_node,
+                                weight_cell_to_cid,
+                                weight_cid_to_cell,
                             )
                             fp.write(edgerow_cid_cell)
                 except KeyError:
@@ -433,8 +494,8 @@ if __name__ == "__main__":
     if args.export:
         el.convert_to_dict()
         gdict = el.convert_to_dict()
-        print("el",el.convert_to_dict())
-        print("gdict",gdict)
+        print("el", el.convert_to_dict())
+        print("gdict", gdict)
         g_nx = nx.from_dict_of_lists(gdict)
         n, _ = osp.splitext(edgefile)
         nx_fname = n + ".nx"

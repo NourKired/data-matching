@@ -1,7 +1,7 @@
 .vscode/
 .idea/
-
+tests/datasets/
 dist/
 *.pyc
-
+modele.bin
 coverage.xml

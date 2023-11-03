@@ -82,7 +82,6 @@ def learn_embeddings(
             model.save("modele.bin")
             model.wv.save_word2vec_format(output_embeddings_file, binary=False)
         else:
-            print("sg",sg)
             model = Doc2Vec(
                 sentences=walks,
                 vector_size=dimensions,
@@ -97,11 +96,23 @@ def learn_embeddings(
     elif training_algorithm == "fasttext":
         print("Using Fasttext")
         if write_walks:
-            model = FastText(corpus_file=walks, window=window_size, min_count=2, workers=workers, vector_size=dimensions)
+            model = FastText(
+                corpus_file=walks,
+                window=window_size,
+                min_count=2,
+                workers=workers,
+                vector_size=dimensions,
+            )
             model.save("modele.bin")
             model.wv.save(output_embeddings_file)
         else:
-            model = FastText(sentences=walks, vector_size=dimensions, workers=workers, min_count=2, window=window_size)
+            model = FastText(
+                sentences=walks,
+                vector_size=dimensions,
+                workers=workers,
+                min_count=2,
+                window=window_size,
+            )
             model.save("modele.bin")
             model.wv.save(output_embeddings_file)
 
