@@ -1,10 +1,19 @@
 .vscode/
 .idea/
+<<<<<<< HEAD
 tests/datasets/
+=======
+tests/
+>>>>>>> test/slurm
 dist/
 *.pyc
 modele.bin
 coverage.xml
+<<<<<<< HEAD
 tests/
 *.py
 *ipynb
+=======
+*.ipynb
+*.py
+>>>>>>> test/slurm
