@@ -88,7 +88,7 @@ def get_embeddings_S1(Embdi_S1_file, model, tokenizer, passage=True):
         emb_att_s1 = get_emb_model(model, tokenizer, att_s1)
         M_s1Mod.append(list(emb_att_s1))
 
-    for data in data_passage:
+    for data in data_passage[:ndim]:
         emb_data_s1 = get_emb_model(model, tokenizer, data)
         M_s1Mod_passage.append(list(emb_data_s1))
 
@@ -131,7 +131,7 @@ def find_similar_attributes(M_s1Emb, M_s2emb, attributes_S2, selected_att_S1):
         indices = [
             i
             for i, sim in enumerate(cos_sim_values)
-            if np.abs(sim) >= 0.5 and sim in get_nmax(cos_sim_values, 2)
+            if np.abs(sim) >= 0.6 and sim in get_nmax(cos_sim_values, 1)
         ]
         detected_S2 = [
             attributes_S2[i] for i in indices if "Nan" not in attributes_S2[i]

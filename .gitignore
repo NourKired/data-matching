@@ -1,7 +1,9 @@
 .vscode/
 .idea/
-tests/datasets/
+tests/
 dist/
 *.pyc
 modele.bin
 coverage.xml
+*.ipynb
+*.py
