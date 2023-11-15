@@ -1,8 +1,10 @@
 .vscode/
 .idea/
 tests/datasets/*
-tests/output_data/*/*
-tests/slurm/*/*
+tests/output_data/data_frames/*
+tests/output_data/edglistes/*
+tests/output_data/embbedings/*
+tests/output_data/walks/*
 dist/
 *.pyc
 modele.bin
