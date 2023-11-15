@@ -103,7 +103,33 @@ Commands:
   randomwalk-
   version                Affiche les informations sur la version.
 ```
+here's an example of call the function detect-similary-all
+```sh
+poetry run data-matching detect-similarity-all --help 
+```
 
+```console
+Usage: data-matching detect-similarity-all [OPTIONS]
+
+Options:
+  -i1, --input1 FILE              Chemin vers le fichier csv S1.
+                                  [required]
+  -i2, --input2 FILE              Chemin vers le fichier csv S1.
+                                  [required]
+  -ws, --walk-strategy [basic|node2vec|deepwalk|metapath2vec]
+                                  Stratégie de marche pour les marches
+                                  aléatoires.  [required]
+  -ns, --n-sentences INTEGER      nombre de phrase de la marche aléatoire.
+                                  [required]
+  -wl, --walk-length INTEGER      Longueur de la marche aléatoire.  [required]
+  -nd, --ndim INTEGER             Dimensions des vecteures dans EMBDI et le modele pre-entrainé  [required]
+  -w, --window-size INTEGER       taille de la fenetere pour les entrainement EMBDI.  [required]
+  -ta, --training-algorithm [word2vec|fasttext|doc2vec]
+                                  choix des algorithmes d'entrainements
+  -lm, --learning-method [skipgram|CBOW]
+                                  choix des methodes d'entrainements
+  --help                          Show this message and exit.
+```
 Example:
 
 ```sh
