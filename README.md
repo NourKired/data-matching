@@ -90,14 +90,18 @@ Will give something like
 ```console
 Usage: data-matching [OPTIONS] COMMAND [ARGS]...
 
-  OKP4 python template, program description.
+  Fonction CLI racine.
 
 Options:
   --help  Show this message and exit.
 
 Commands:
-  main-cmd  Does something interesting...
-  version   Print the application version information
+  detect-similarity-
+  detect-similarity-all
+  edgelist-
+  embdi-
+  randomwalk-
+  version                Affiche les informations sur la version.
 ```
 
 Example:
